@@ -7,7 +7,8 @@ const nextConfig = {
     PGHOST: 'ep-hidden-grass-536062.us-east-2.aws.neon.tech',
     PGDATABASE: 'bookstore',
     PGUSER:'Sadiii',
-    PGPASSWORD:'c2Syd1lUkxZu'
+    PGPASSWORD:'c2Syd1lUkxZu',
+    ACCESS_TOKEN_GEN:'shhhhhh'
   }
 }
 

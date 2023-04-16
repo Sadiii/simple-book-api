@@ -4,26 +4,32 @@ import postgres from "postgres";
 export async function GET(request: NextRequest) {
     const conn = postgres({
     ssl: require,
-    });
-    let orders:Order[] = await conn.unsafe("SELECT * FROM orders");
-
+    })
+    const query  = "SELECT * FROM orders"
+    let orders:Order[] = await conn.unsafe(query);
+    console.log(orders)
     const results = orders.map(order=>(
     {orderId:order.orderId,
     customerName:order.customerName}
     ))
-    return new NextResponse(JSON.stringify(results));
+    return NextResponse.json(results);
 }
 
 export async function POST(request:NextRequest) {
     const{bookId, customerName } = await request.json()
-    console.log(request.headers)
+    let token = request.headers.get("authorization") as string;
     if(!bookId || !customerName)return NextResponse.json({"message":"Missing required data" })
+    const orderId = Math.random().toString(36).slice(2)
+    console.log(orderId)
+    const query = `INSERT INTO orders (orderId, customerName, accesstoken, bookId)
+    VALUES ('${orderId}','${customerName}', '${token}', ${bookId}) returning *`;
+    
 
-    console.log(bookId, customerName)
-    // const conn = postgres({
-    //     ssl: require,
-    //     });
-    //     let orders:Order[] = await conn.unsafe(`INSERT INTO orders VALUES (${bookId}, '${customerName}', 9.99);`);
+    const conn = postgres({ssl: require});
+    const response = await conn.unsafe(query);
+    return NextResponse.json(response, {
+        status: 201,
+      });
     
   }
   

@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
     const conn = postgres({
     ssl: require,
     });
-    //  let books:Book[] = await conn.unsafe("SELECT * FROM books");
-    let books:Book[] = await conn.unsafe(
+
+    const books:Book[] = await conn.unsafe(
         (limit && type)?`SELECT * FROM books WHERE type='${type}' LIMIT ${limit}`:limit?`SELECT * FROM books ORDER BY id asc limit ${limit}`:type? `SELECT * FROM books WHERE type='${type}'`:"SELECT * FROM books"
     );
     const results = books.map(book=>(
@@ -18,5 +18,7 @@ export async function GET(request: NextRequest) {
     type:book.type,
     available:book.available}
     ))
-    return new NextResponse(JSON.stringify(results));
+    return NextResponse.json(results, {
+        status: 200,
+      });
 }
