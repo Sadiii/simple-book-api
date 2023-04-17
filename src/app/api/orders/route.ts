@@ -5,31 +5,34 @@ export async function GET(request: NextRequest) {
     const conn = postgres({
     ssl: require,
     })
+    // select orders from db and execute query
     const query  = "SELECT * FROM orders"
     let orders:Order[] = await conn.unsafe(query);
-    console.log(orders)
-    const results = orders.map(order=>(
-    {orderId:order.orderId,
-    customerName:order.customerName}
-    ))
-    return NextResponse.json(results);
+    return NextResponse.json(orders);
 }
 
 export async function POST(request:NextRequest) {
-    const{bookId, customerName } = await request.json()
-    let token = request.headers.get("authorization") as string;
-    if(!bookId || !customerName)return NextResponse.json({"message":"Missing required data" })
-    const orderId = Math.random().toString(36).slice(2)
-    console.log(orderId)
-    const query = `INSERT INTO orders (orderId, customerName, accesstoken, bookId)
-    VALUES ('${orderId}','${customerName}', '${token}', ${bookId}) returning *`;
-    
 
+    // fetch bookId and customerName from request body
+    const{bookId, customerName } = await request.json()
+
+    // fetch client email from header
+    const clientEmail = JSON.parse(request.headers.get("clientemail")!);
+    if(!bookId || !customerName)return NextResponse.json({"message":"Missing required data" })
+
+    // generate random order Id
+    const orderId = Math.random().toString(36).slice(2)
+
+    // store order data to db
+    const query = `INSERT INTO orders (orderId, customerName,clientEmail, bookId)
+    VALUES ('${orderId}','${customerName}', '${clientEmail}', ${bookId}) returning *`;
+    // execute query
     const conn = postgres({ssl: require});
     const response = await conn.unsafe(query);
+    // send post response back
     return NextResponse.json(response, {
         status: 201,
-      });
-    
+    });
+
   }
   

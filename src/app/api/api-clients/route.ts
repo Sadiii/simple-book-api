@@ -23,7 +23,7 @@ export async function POST(request:NextRequest) {
         { expiresIn: "7d" }
       );
 
-    const query = `INSERT INTO clients VALUES ('${accessToken}', '${clientName}', '${clientEmail}');`
+    const query = `INSERT INTO clients VALUES ('${clientEmail}', '${clientName}');`
 
     const conn = postgres({ssl: require,});
     await conn.unsafe(query);
@@ -35,8 +35,6 @@ export async function POST(request:NextRequest) {
     }
     );
     }catch (error: any) {
-        console.log(error);
-
         return NextResponse.json(
         { error: "API client already registered." },
         {
